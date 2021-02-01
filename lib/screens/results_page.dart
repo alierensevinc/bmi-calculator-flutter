@@ -4,14 +4,10 @@ import '../components/reusable_card.dart';
 import '../components/bottom_button.dart';
 
 class ResultsPage extends StatelessWidget {
-  ResultsPage(
-      {@required this.bmiResult,
-      @required this.resultText,
-      @required this.interpretation});
+  ResultsPage({@required this.bmiResult, @required this.resultText});
 
   final String bmiResult;
   final String resultText;
-  final String interpretation;
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +44,6 @@ class ResultsPage extends StatelessWidget {
                   Text(
                     bmiResult,
                     style: bmiTextStyle,
-                  ),
-                  Text(
-                    interpretation,
-                    style: bodyTextStyle,
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),

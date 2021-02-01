@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../calculator_brain.dart';
-import '../constants.dart';
 import 'results_page.dart';
+import '../calculator_service.dart';
+import '../constants.dart';
 import '../components/reusable_card.dart';
 import '../components/icon_content.dart';
 import '../components/bottom_button.dart';
+import '../components/round_icon_button.dart';
 
 enum Gender { male, female }
 
@@ -20,10 +22,29 @@ class _InputPageState extends State<InputPage> {
   int weight = 60;
   int age = 24;
 
-  void changeWeight(bool isPlus) {
-    setState(() {
-      weight = isPlus ? weight++ : weight--;
-    });
+  _onBasicAlertPressed(context) {
+    Alert(
+      context: context,
+      title: "Error",
+      desc: "Please select your gender.",
+      style: AlertStyle(
+        backgroundColor: Colors.white,
+      ),
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Ok",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+            ),
+          ),
+          onPressed: () => Navigator.pop(context),
+          width: 120,
+          color: Color(0xFFEB1555),
+        ),
+      ],
+    ).show();
   }
 
   @override
@@ -48,9 +69,11 @@ class _InputPageState extends State<InputPage> {
                       label: 'MALE',
                     ),
                     onPress: () {
-                      setState(() {
-                        this.selectedGender = Gender.male;
-                      });
+                      setState(
+                        () {
+                          this.selectedGender = Gender.male;
+                        },
+                      );
                     },
                   ),
                 ),
@@ -64,9 +87,11 @@ class _InputPageState extends State<InputPage> {
                       label: 'FEMALE',
                     ),
                     onPress: () {
-                      setState(() {
-                        this.selectedGender = Gender.female;
-                      });
+                      setState(
+                        () {
+                          this.selectedGender = Gender.female;
+                        },
+                      );
                     },
                   ),
                 ),
@@ -80,7 +105,7 @@ class _InputPageState extends State<InputPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'HEIGHT',
+                    'Height',
                     style: labelTextStyle,
                   ),
                   Row(
@@ -102,9 +127,11 @@ class _InputPageState extends State<InputPage> {
                     max: 220.0,
                     value: height.toDouble(),
                     onChanged: (double newValue) {
-                      setState(() {
-                        height = newValue.round();
-                      });
+                      setState(
+                        () {
+                          height = newValue.round();
+                        },
+                      );
                     },
                   ),
                 ],
@@ -125,7 +152,7 @@ class _InputPageState extends State<InputPage> {
                           style: labelTextStyle,
                         ),
                         Text(
-                          weight.toString(),
+                          weight.toString() + ' kg',
                           style: numberTextStyle,
                         ),
                         Row(
@@ -134,9 +161,13 @@ class _InputPageState extends State<InputPage> {
                             RoundIconButton(
                               icon: FontAwesomeIcons.minus,
                               onPressed: () {
-                                setState(() {
-                                  weight--;
-                                });
+                                if (weight > 1) {
+                                  setState(
+                                    () {
+                                      weight--;
+                                    },
+                                  );
+                                }
                               },
                             ),
                             SizedBox(
@@ -145,13 +176,15 @@ class _InputPageState extends State<InputPage> {
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
                               onPressed: () {
-                                setState(() {
-                                  weight++;
-                                });
+                                setState(
+                                  () {
+                                    weight++;
+                                  },
+                                );
                               },
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -176,9 +209,13 @@ class _InputPageState extends State<InputPage> {
                             RoundIconButton(
                               icon: FontAwesomeIcons.minus,
                               onPressed: () {
-                                setState(() {
-                                  age--;
-                                });
+                                if (age > 1) {
+                                  setState(
+                                    () {
+                                      age--;
+                                    },
+                                  );
+                                }
                               },
                             ),
                             SizedBox(
@@ -187,13 +224,15 @@ class _InputPageState extends State<InputPage> {
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
                               onPressed: () {
-                                setState(() {
-                                  age++;
-                                });
+                                setState(
+                                  () {
+                                    age++;
+                                  },
+                                );
                               },
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -203,44 +242,27 @@ class _InputPageState extends State<InputPage> {
           ),
           BottomButton(
             onTap: () {
-              CalculatorBrain calc =
-                  CalculatorBrain(height: height, weight: weight);
+              if (selectedGender != null) {
+                CalculateService calc =
+                    CalculateService(height: height, weight: weight);
 
-              Navigator.push(
-                context,
-                MaterialPageRoute(
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
                     builder: (context) => ResultsPage(
-                          bmiResult: calc.calculateBMI(),
-                          resultText: calc.getResult(),
-                          interpretation: calc.getInterpretation(),
-                        )),
-              );
+                      bmiResult: calc.calculateBMI(),
+                      resultText: calc.getResult(),
+                    ),
+                  ),
+                );
+              } else {
+                _onBasicAlertPressed(context);
+              }
             },
             buttonTitle: 'CALCULATE',
           ),
         ],
       ),
-    );
-  }
-}
-
-class RoundIconButton extends StatelessWidget {
-  RoundIconButton({this.icon, this.onPressed});
-
-  final IconData icon;
-  final Function onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return RawMaterialButton(
-      child: Icon(icon),
-      onPressed: onPressed,
-      constraints: BoxConstraints.tightFor(
-        width: 56.0,
-        height: 56.0,
-      ),
-      shape: CircleBorder(),
-      fillColor: Color(0xFF4C4F5E),
     );
   }
 }
